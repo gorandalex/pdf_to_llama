@@ -1,8 +1,8 @@
-"""Init
+"""empty message
 
-Revision ID: 9e4736a71b83
+Revision ID: 6ccc59247723
 Revises: 
-Create Date: 2023-06-01 19:01:23.168570
+Create Date: 2023-09-29 22:48:46.654381
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '9e4736a71b83'
+revision = '6ccc59247723'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,7 +33,6 @@ def upgrade() -> None:
     sa.Column('password', sa.String(length=255), nullable=False),
     sa.Column('first_name', sa.String(length=255), nullable=False),
     sa.Column('last_name', sa.String(length=255), nullable=False),
-    sa.Column('avatar', sa.String(length=255), nullable=True),
     sa.Column('role', postgresql.ENUM('admin', 'moderator', 'user', name='user_role'), nullable=False),
     sa.Column('refresh_token', sa.String(length=255), nullable=True),
     sa.Column('email_verified', sa.Boolean(), nullable=False),
@@ -46,7 +45,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_users_first_name'), 'users', ['first_name'], unique=False)
     op.create_index(op.f('ix_users_last_name'), 'users', ['last_name'], unique=False)
     op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
-    op.create_table('images',
+    op.create_table('documents',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('public_id', sa.String(length=255), nullable=False),
     sa.Column('description', sa.String(length=1200), nullable=False),
@@ -56,65 +55,35 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('image_comments',
+    op.create_table('document_comments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('data', sa.String(length=500), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('image_id', sa.Integer(), nullable=False),
+    sa.Column('document_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['image_id'], ['images.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['document_id'], ['documents.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_image_comments_data'), 'image_comments', ['data'], unique=False)
-    op.create_table('image_formats',
+    op.create_index(op.f('ix_document_comments_data'), 'document_comments', ['data'], unique=False)
+    op.create_table('document_m2m_tag',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('format', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('image_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['image_id'], ['images.id'], onupdate='CASCADE', ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], onupdate='CASCADE', ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('format', 'image_id', name='unique_format_image')
-    )
-    op.create_index(op.f('ix_image_formats_id'), 'image_formats', ['id'], unique=False)
-    op.create_index(op.f('ix_image_formats_image_id'), 'image_formats', ['image_id'], unique=False)
-    op.create_index(op.f('ix_image_formats_user_id'), 'image_formats', ['user_id'], unique=False)
-    op.create_table('image_m2m_tag',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('image_id', sa.Integer(), nullable=True),
+    sa.Column('document_id', sa.Integer(), nullable=True),
     sa.Column('tag_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['image_id'], ['images.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['document_id'], ['documents.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('image_ratings',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('rating', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('image_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['image_id'], ['images.id'], onupdate='CASCADE', ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], onupdate='CASCADE', ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('user_id', 'image_id', name='unique_user_image_rating')
     )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('image_ratings')
-    op.drop_table('image_m2m_tag')
-    op.drop_index(op.f('ix_image_formats_user_id'), table_name='image_formats')
-    op.drop_index(op.f('ix_image_formats_image_id'), table_name='image_formats')
-    op.drop_index(op.f('ix_image_formats_id'), table_name='image_formats')
-    op.drop_table('image_formats')
-    op.drop_index(op.f('ix_image_comments_data'), table_name='image_comments')
-    op.drop_table('image_comments')
-    op.drop_table('images')
+    op.drop_table('document_m2m_tag')
+    op.drop_index(op.f('ix_document_comments_data'), table_name='document_comments')
+    op.drop_table('document_comments')
+    op.drop_table('documents')
     op.drop_index(op.f('ix_users_username'), table_name='users')
     op.drop_index(op.f('ix_users_last_name'), table_name='users')
     op.drop_index(op.f('ix_users_first_name'), table_name='users')
