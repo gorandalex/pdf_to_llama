@@ -8450,12 +8450,12 @@ body {
        color: rgba(0, 0, 0, 0.3); }
    
      .btn.btn-primary {
-       background: #4ba1fa;
-       border-color: #4ba1fa;
+       background: #666666;
+       border-color: #666666;
        color: #fff; }
        .btn.btn-primary:hover, .btn.btn-primary:focus {
-         border-color: #1987f9 !important;
-         background: #1987f9 !important; }
+         border-color: #666666 !important;
+         background: #666666 !important; }
        .btn.btn-primary.btn-link {
          background: transparent;
          color: #fff;

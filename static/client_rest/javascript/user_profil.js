@@ -77,10 +77,10 @@ const getInfoUser = async () => {
       usercreateLi.classList.add("text-left");
       userInfoUl.appendChild(usercreateLi)
 
-      const userImageNumberLi = document.createElement("li");
-      userImageNumberLi.textContent = `Number users photos: ${result.number_of_images}`;
-      userImageNumberLi.classList.add("text-left");
-      userInfoUl.appendChild(userImageNumberLi)
+      const userDocumentNumberLi = document.createElement("li");
+      userDocumentNumberLi.textContent = `Number users photos: ${result.number_of_documents}`;
+      userDocumentNumberLi.classList.add("text-left");
+      userInfoUl.appendChild(userDocumentNumberLiNumberLi)
 
       aboutUserDdiv.appendChild(userInfoUl)
       el2.appendChild(avatarDiv)

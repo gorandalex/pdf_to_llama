@@ -17,8 +17,8 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 
-from svitlogram.database.connect import get_db
-from svitlogram.routes import router
+from docubot.database.connect import get_db
+from docubot.routes import router
 from config import (
     settings,
     PROJECT_NAME,
