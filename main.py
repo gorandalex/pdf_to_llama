@@ -93,7 +93,7 @@ BASE_DIR = Path(__file__).parent
 app.mount("/static", StaticFiles(directory=BASE_DIR/"static", html=True), name="static")
 
 
-@app.get("/", name="Svitlogram_api", response_class=HTMLResponse)
+@app.get("/", name="Docubot_api", response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 

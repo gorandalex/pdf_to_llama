@@ -265,24 +265,14 @@ async def search_data(
         db: Session = Depends(get_db),
         _: User = Depends(get_current_active_user)
 ) -> Any:
-    """
-    The search_data function is used to search for users and images.
-        It takes a string as an argument, which will be searched in the database.
-        If there are no results, it returns a 404 error with the message &quot;Data not found&quot;.
 
-
-    :param data: str: Get the data that will be searched for
-    :param db: Session: Get a database session from the dependency injection container
-    :param _: User: Check if the user is logged in
-    :return: A searchresults object, which contains the results of both searches
-    """
     users = await repository_users.search_users(data, db)
-    images = await repository_images.search_images(data, db)
+    documents = await repository_documents.search_documents(data, db)
 
-    if not users and not images:
+    if not users and not documents:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
 
-    return SearchResults(users=users, images=images)
+    return SearchResults(users=users, docunents=documents)
 
 
 @router.get("/users/with_filter", response_model=list[UserPublic])
@@ -295,24 +285,10 @@ async def get_users_with_filter(
     role: Optional[UserRole] = None,
     created_at_start: Optional[str] = "2023-01-01",
     created_at_end: Optional[str] = datetime.today().strftime("%Y-%m-%d"),
-    has_images: Optional[bool] = None,
+    has_documents: Optional[bool] = None,
     db: Session = Depends(get_db),
 ) -> list[UserPublic]:
-    """
-    Get a list of users from the database, filtered by the specified criteria.
 
-    :param current_user: User: Get the current user from the database.
-    :param skip: int: Skip the first n records in the database.
-    :param limit: int: Limit the number of results returned.
-    :param first_name: str: Filter users by first name.
-    :param last_name: str: Filter users by last name.
-    :param role: str: Filter users by role.
-    :param created_at_start: str: Filter users by created_at start date (format: YYYY-MM-DD).
-    :param created_at_end: str: Filter users by created_at end date (format: YYYY-MM-DD).
-    :param has_images: bool: Filter users by the presence of images.
-    :param db: Session: The database session dependency.
-    :return: List[UserPublic]: List of users, filtered by the specified criteria.
-    """
     if current_user.role == UserRole.user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Access denied. Access not open to 'user' role.")
@@ -330,6 +306,6 @@ async def get_users_with_filter(
                             detail=f"Invalid date format: {created_at_end}. Use format: YYYY-MM-DD.")
 
     return await repository_users.get_users_with_filter(db, skip, limit, first_name, last_name, role, 
-                                                        created_at_start, created_at_end, has_images)
+                                                        created_at_start, created_at_end, has_documents)
 
 
