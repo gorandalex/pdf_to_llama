@@ -2,9 +2,9 @@
 
 <img src="docubot.jpg" align="center" style="width: 550px"  />
 
-## REST API Service for work and analize pdf files
+## REST API Service for work and analyze pdf files
 
-This is a REST API service that allows users to upload and recognize of text from PDF files. Due to LLM technologies it allows to get only nessesary information 
+This is a REST API service that allows users to upload and recognize of text from PDF files. Due to LLM technologies it allows to get only necessary information 
 
 ### Technologies
 
