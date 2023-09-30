@@ -15,7 +15,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .tags import Tag
 from .base import Base
 from .users import User
-from .document_comments import DocumentComment
+from .chats import Chat
 
 
 
@@ -39,7 +39,7 @@ class Document(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped[User] = relationship(backref="documents")
     tags: Mapped[Tag] = relationship("Tag", secondary=document_m2m_tag, backref="documents", lazy='joined')
-    comments: Mapped[DocumentComment] = relationship(backref="document", cascade="all, delete-orphan")
+    chats: Mapped[Chat] = relationship(backref="document", cascade="all, delete-orphan")
 
 
     

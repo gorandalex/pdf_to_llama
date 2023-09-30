@@ -11,16 +11,15 @@ This is a REST API service that allows users to upload and recognize of text fro
 Python - Programming language
 FastAPI - Web framework for building APIs
 SQLAlchemy - Object-relational mapping library
-FAIS - Flood Analytics Information System (FAIS) - Big Data Gathering package from twitter and USGS
  Llama 2  - artificial intelligence LLM
 
 ### The API supports the following features:
 
 - User registration and authentication
-- Uploading and storing pdf files
-- Adding  tags  to pdf files and filtering them by tags
-- Recognizing of text in pdf and store it
-- Chat options and issues about information in pdf files
+- Uploading and storing pdf and text files
+- Adding  tags  to files and filtering them by tags
+- Recognizing of text in pdf and store it 
+- Chat options and issues about information in files
 
 ### Our Team 3:
 

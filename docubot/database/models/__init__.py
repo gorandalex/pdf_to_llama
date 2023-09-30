@@ -1,7 +1,7 @@
 from .base import Base
 from .users import User, UserRole
 from .documents import Document
-from .document_comments import DocumentComment
+from .chats import Chat
 
 from .tags import Tag
 
@@ -12,6 +12,6 @@ __all__ = (
     'User',
     'UserRole',
     'Document',
-    'DocumentComment',
+    'Chat',
     'Tag',
 )

@@ -20,6 +20,8 @@ router = APIRouter(prefix="/documents", tags=["Documents"])
 allowed_content_types_upload = [
     ".doc",
     ".pdf",
+    ".txt",
+    ".docx"
     ]
 
 
