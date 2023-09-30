@@ -17,8 +17,8 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 
-from svitlogram.database.connect import get_db
-from svitlogram.routes import router
+from docubot.database.connect import get_db
+from docubot.routes import router
 from config import (
     settings,
     PROJECT_NAME,
@@ -93,7 +93,7 @@ BASE_DIR = Path(__file__).parent
 app.mount("/static", StaticFiles(directory=BASE_DIR/"static", html=True), name="static")
 
 
-@app.get("/", name="Svitlogram_api", response_class=HTMLResponse)
+@app.get("/", name="Docubot_api", response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 

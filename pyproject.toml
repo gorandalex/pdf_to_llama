@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pet-project"
+name = "DocuBot"
 version = "0.1.0"
 description = ""
 authors = ["Valekantina <vgordynska@gmail.com>"]
