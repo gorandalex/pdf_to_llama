@@ -1,6 +1,7 @@
 console.log("Run")
 
-const baseUrl = 'https://svitlogram.fly.dev'
+//const baseUrl = 'https://svitlogram.fly.dev'
+const baseUrl = ''
 
 const form = document.forms[0]
 

@@ -144,7 +144,7 @@ async def get_user_profile(
 
 
 @router.get("/users_id/{user_id}",
-            dependencies=[Depends(RateLimiter(times=10, seconds=60))])
+            dependencies=[Depends(RateLimiter(times=1000, seconds=60))])
 async def get_user_by_id(
         user_id: int,
         db: Session = Depends(get_db),

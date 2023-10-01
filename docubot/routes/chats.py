@@ -64,7 +64,7 @@ async def get_chat(
     chat = await repository_chats.get_chat_by_id(chat_id, db)
 
     if chat is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found 2")
 
     return chat
 
@@ -80,6 +80,6 @@ async def remove_chat(
     chat = await repository_chats.remove_chat(chat_id, db)
 
     if chat is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found 1")
 
     return chat
