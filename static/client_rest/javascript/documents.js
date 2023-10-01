@@ -36,9 +36,9 @@ const getUserById = async (user_id) => {
     redirect: 'follow'
   };
 
-  const respons = await fetch(`${baseUrl}/api/users/users_id/${user_id}`, requestOptions)
-  if (respons.status === 200) {
-    result = await respons.json()
+  const response = await fetch(`${baseUrl}/api/users/users_id/${user_id}`, requestOptions)
+  if (response.status === 200) {
+    result = await response.json()
     return result;
   }
 }
@@ -62,7 +62,47 @@ const getUserByUserName = async (username) => {
   }
 }
 
-const form = document.forms[0];
+document.getElementById('uploadForm').addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  if (!this.checkValidity()) {
+    this.reportValidity();
+  }
+
+  if (this.elements['file'].files.length === 0) {
+      return;
+  }
+
+  if (this.elements['description'].value === '') {
+      alert('Please, define description');
+      return;
+  }
+
+  const file = this.elements['file'].files[0];
+  const description = this.elements['description'].value;
+
+  var data = new FormData();
+  data.append('file', file);
+  data.append('description', description);
+
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${token}`
+    },
+    redirect: 'follow',
+    body: data
+  };
+
+  const response = await fetch(`${baseUrl}/api/documents/`, requestOptions)
+  if (response.status == 201) {
+    window.location = `/static/client_rest/documents.html`
+  } else {
+    alert("File upload error");
+  }
+});
+
+const form = document.getElementById('searchForm');
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault()
@@ -73,7 +113,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-const form1 = document.forms[1];
+const form1 = document.getElementById('open_ai_form');
 
 form1.addEventListener("submit", async (e) => {
   e.preventDefault()
@@ -116,7 +156,7 @@ const getDocuments = async () => {
     redirect: 'follow'
   };
 
-  const response = await fetch(`${baseUrl}/api/documents`, requestOptions)
+  const response = await fetch(`${baseUrl}/api/documents/?sort_by=date_added_desc`, requestOptions)
   if (response.status === 200) {
     result = await response.json();
     documents.innerHTML = "";
