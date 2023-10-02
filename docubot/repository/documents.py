@@ -100,8 +100,8 @@ async def get_documents(
     if tags:
         for tag in tags:
             query = query.filter(Document.tags.any(Tag.name.ilike(f'%{tag}%')))
-    if user_id:
-        query = query.filter(Document.user_id == user_id)
+
+    query = query.filter(Document.user_id == user_id)
     if document_id:
         query = query.filter(Document.id == document_id)
 

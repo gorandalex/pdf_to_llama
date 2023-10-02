@@ -22,7 +22,12 @@
     <div class="container">
         <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
             <p class="col-md-4 mb-0 text-body-secondary">&copy; 2023 DocuBot</p>
-
+            
+            <form class="d-flex ml-auto" id="searchForm">
+                <input class="form-control me-2" id="search_info" type="search_info" placeholder="Search">
+                <button class="btn mb-2 mb-md-0 btn-outline-danger btn-sm" type="submit">Search</button>
+            </form>
+            
 
     
             <ul class="nav col-md-4 justify-content-end">
@@ -64,7 +69,25 @@
                     </nav>   -->
                 </div>
     
-
+                <div class="col-6 col-lg-4 themed-grid-col">
+                    <div class="d-grid gap-2 d-sm-flex justify-content-center mb-5">
+                        <form class="d-flex ml-auto" id="open_ai_form">
+                            <input class="form-control me-2" id="open_ai_form" type="open_ai_form" placeholder="Send a message">
+                            <button class="btn mb-2 mb-md-0 btn-outline-danger btn-sm" type="submit">Send</button>
+                        </form>
+                        
+                    </div>
+                    <div id="return_answer" ></div>
+                    <!--
+                    <div class="d-grid gap-3 justify-content-center mb-5">
+                        <h3 class="text-top-tags">TOP 10 tags</h3>
+                        <div class="d-grid gap-3 justify-content-center mb-5">
+                        <a class="btn mb-2 mb-md-0 btn-outline-danger btn-sm" href="#">Top Top</a>
+                        
+                        </div>
+                    </div>  -->
+    
+                </div>
             </div>
         </div>
     

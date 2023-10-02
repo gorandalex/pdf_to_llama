@@ -1,18 +1,19 @@
 token = localStorage.getItem("accessToken")
 
 documents = document.getElementById("documents")
-//// new code
-//const uploadForm = document.getElementById('uploadForm');
-//
-//uploadForm.addEventListener('submit', async function(e) {
-//  e.preventDefault();
-//
-//  if (uploadForm.elements['file'].files.length > 5) {
-//    alert('You can upload no more than 5 files');
-//    return;
-//  }
-//// end of new code
-////const baseUrl = 'https://svitlogram.fly.dev';
+// new code
+const uploadForm = document.getElementById('uploadForm');
+
+uploadForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  if (uploadForm.elements['file'].files.length > 5) {
+    alert('You can upload no more than 5 files');
+    return;
+  }
+// end of new code
+
+//const baseUrl = 'https://svitlogram.fly.dev';
 const baseUrl = '';
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -112,6 +113,48 @@ document.getElementById('uploadForm').addEventListener("submit", async function 
   }
 });
 
+const form = document.getElementById('searchForm');
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault()
+  const searchValue = form.search_info.value
+  if (searchValue) {
+    const encodedSearchValue = encodeURIComponent(searchValue);
+    window.location = `/static/client_rest/search_info.html?search=${encodedSearchValue}`;
+  }
+});
+
+const form1 = document.getElementById('open_ai_form');
+
+form1.addEventListener("submit", async (e) => {
+  e.preventDefault()
+  const openAiQuestion = form1.open_ai_form.value
+  if (openAiQuestion) {
+    const getAnswer = async () => {
+      const myHeaders = new Headers();
+      myHeaders.append(
+        "Authorization",
+        `Bearer ${token}`);
+
+      const requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+      };
+
+      const respons = await fetch(`${baseUrl}/api/openai/?data=${openAiQuestion}`, requestOptions)
+      if (response.status == 200) {
+        answerAi = await response.json()
+
+        const message = encodeURIComponent(answerAi)
+        window.location = `/static/client_rest/documents.html?message=${message}`
+      }
+    }
+    getAnswer()
+  }
+
+});
+
 const getDocuments = async () => {
   const myHeaders = new Headers();
   myHeaders.append(
@@ -181,3 +224,4 @@ const getDocuments = async () => {
 }
 
 getDocuments();
+
