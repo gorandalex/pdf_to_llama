@@ -132,20 +132,18 @@ const getDocuments = async () => {
       const avatarUserNameDiv = document.createElement('div');
       avatarUserNameDiv.className = "author mb-2 mt-2"
 
-      const authorLink = document.createElement('a');
-      authorLink.className = 'author';
-      authorLink.textContent = user.username;
-      authorLink.href = `user_profile.html?username=${user.username}`
-      avatarUserNameDiv.appendChild(authorLink);
+      const chatLink = document.createElement('a');
+      chatLink.className = 'chat';
+      chatLink.textContent = doc.description;
+      chatLink.href = `chats.html?id=${doc.id}`
+      avatarUserNameDiv.appendChild(chatLink);
 
       const docDiv = document.createElement('div');
       docDiv.appendChild(documentUrl);
 
       const documentsDescriptionDiv = document.createElement('div');
       documentsDescriptionDiv.className = "some_class mb-2"
-      const descriptionSpan = document.createElement('span');
-      descriptionSpan.textContent = doc.description;
-      documentsDescriptionDiv.appendChild(descriptionSpan);
+
 
       const topicsDiv = document.createElement('div');
       topicsDiv.className = 'node__topics';
