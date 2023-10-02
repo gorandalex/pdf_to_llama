@@ -1,17 +1,7 @@
 token = localStorage.getItem("accessToken")
 
 documents = document.getElementById("documents")
-//// new code
-//const uploadForm = document.getElementById('uploadForm');
-//
-//uploadForm.addEventListener('submit', async function(e) {
-//  e.preventDefault();
-//
-//  if (uploadForm.elements['file'].files.length > 5) {
-//    alert('You can upload no more than 5 files');
-//    return;
-//  }
-//// end of new code
+
 ////const baseUrl = 'https://svitlogram.fly.dev';
 const baseUrl = '';
 
@@ -48,7 +38,7 @@ const getUserById = async (user_id) => {
 
   const response = await fetch(`${baseUrl}/api/users/users_id/${user_id}`, requestOptions)
   if (response.status === 200) {
-    result = await response.json()
+    const result = await response.json()
     return result;
   }
 }
@@ -67,12 +57,13 @@ const getUserByUserName = async (username) => {
 
   const response = await fetch(`${baseUrl}/api/users/${username}`, requestOptions)
   if (response.status === 200) {
-    result = await response.json()
+    const result = await response.json()
     return result;
   }
 }
+const uploadForm = document.getElementById('uploadForm');
 
-document.getElementById('uploadForm').addEventListener("submit", async function (e) {
+uploadForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
   if (!this.checkValidity()) {
@@ -126,7 +117,7 @@ const getDocuments = async () => {
 
   const response = await fetch(`${baseUrl}/api/documents/?sort_by=date_added_desc`, requestOptions)
   if (response.status === 200) {
-    result = await response.json();
+    const result = await response.json();
     documents.innerHTML = "";
 
     for (const doc of result) {
@@ -141,20 +132,18 @@ const getDocuments = async () => {
       const avatarUserNameDiv = document.createElement('div');
       avatarUserNameDiv.className = "author mb-2 mt-2"
 
-      const authorLink = document.createElement('a');
-      authorLink.className = 'author';
-      authorLink.textContent = user.username;
-      authorLink.href = `user_profile.html?username=${user.username}`
-      avatarUserNameDiv.appendChild(authorLink);
+      const chatLink = document.createElement('a');
+      chatLink.className = 'chat';
+      chatLink.textContent = doc.description;
+      chatLink.href = `chats.html?id=${doc.id}`
+      avatarUserNameDiv.appendChild(chatLink);
 
       const docDiv = document.createElement('div');
       docDiv.appendChild(documentUrl);
 
       const documentsDescriptionDiv = document.createElement('div');
       documentsDescriptionDiv.className = "some_class mb-2"
-      const descriptionSpan = document.createElement('span');
-      descriptionSpan.textContent = doc.description;
-      documentsDescriptionDiv.appendChild(descriptionSpan);
+
 
       const topicsDiv = document.createElement('div');
       topicsDiv.className = 'node__topics';
@@ -176,6 +165,9 @@ const getDocuments = async () => {
       el.appendChild(documentsDescriptionDiv);
 
       documents.appendChild(el);
+    }
+    if (result.length === 5) {
+        uploadForm.setAttribute("hidden", "hidden");
     }
   }
 }

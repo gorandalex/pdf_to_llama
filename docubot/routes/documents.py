@@ -77,6 +77,12 @@ async def upload_document(
                 raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                                     detail=f'Invalid length tag: {tag}')
 
+    count_documents = await repository_documents.count_documents_by_user_id(current_user.id, db)
+    if count_documents >= 5:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Maximum five documents can be added")
+
+
     # loop = asyncio.get_event_loop()
     # document = await loop.run_in_executor(
     #     None,
