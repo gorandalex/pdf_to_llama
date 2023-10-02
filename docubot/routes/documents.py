@@ -123,7 +123,6 @@ async def get_documents(
         description: Optional[str] = Query(default=None, min_length=3, max_length=1200),
         tags: Optional[list[str]] = Query(default=None, max_length=50),
         document_id: Optional[int] = Query(default=None, ge=1),
-        user_id: Optional[int] = Query(default=None, ge=1),
         sort_by: Optional[repository_documents.SortMode] = repository_documents.SortMode.NOT_SORT,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_active_user)
@@ -134,7 +133,7 @@ async def get_documents(
         description,
         tags,
         document_id,
-        user_id,
+        current_user.id,
         sort_by,
         db
     )
