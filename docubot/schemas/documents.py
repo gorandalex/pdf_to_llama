@@ -2,7 +2,6 @@ from pydantic import utils, root_validator
 
 from .core import CoreModel, IDModelMixin, DateTimeModelMixin
 from .tag import TagResponse
-from docubot.services.cloudinary import formatting_document_url
 
 
 class DocumentBase(CoreModel):
@@ -18,12 +17,12 @@ class DocumentBase(CoreModel):
     @root_validator(pre=True)
     def update_model(cls, values: utils.GetterDict):
         if 'url' not in values.keys():
-            values._obj.url = cls.format_url(values._obj.public_id)  # noqa
+            values._obj.url = cls.format_url(values._obj.id)  # noqa
         return values
 
     @staticmethod
-    def format_url(public_id: str):
-        return formatting_document_url(public_id)['url']
+    def format_url(id: int):
+        return "/api/documents/content/" + str(id)
 
 
 class DocumentPublic(DateTimeModelMixin, DocumentBase, IDModelMixin):

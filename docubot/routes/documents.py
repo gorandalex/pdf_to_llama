@@ -13,20 +13,23 @@ from docubot.repository import documents as repository_documents, tags as reposi
 from docubot.schemas.documents import DocumentCreateResponse, DocumentPublic, DocumentRemoveResponse
 from docubot.services import cloudinary
 from docubot.services.auth import get_current_active_user
-
+import uuid
+import os
+import aiofiles
+from fastapi.responses import FileResponse
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
 allowed_content_types_upload = [
-    ".doc",
     ".pdf",
-    ".txt",
-    ".docx"
-    ]
+]
 
 
 @router.post(
-    "/", response_model=DocumentCreateResponse, response_model_by_alias=False, status_code=status.HTTP_201_CREATED,
+    "/",
+    response_model=DocumentCreateResponse,
+    response_model_by_alias=False,
+    status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(RateLimiter(times=10, seconds=60))]
 )
 async def upload_document(
@@ -74,20 +77,46 @@ async def upload_document(
                 raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                                     detail=f'Invalid length tag: {tag}')
 
-    loop = asyncio.get_event_loop()
-    document = await loop.run_in_executor(None, cloudinary.upload_document, file.file)
+    # loop = asyncio.get_event_loop()
+    # document = await loop.run_in_executor(
+    #     None,
+    #     cloudinary.upload_document,
+    #     file.file
+    # )
+    #
+    # if document is None:
+    #     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid document file")
 
-    if document is None:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid document file")
+    documentPublicId = str(uuid.uuid4())
 
-    document = await repository_documents.create_document(current_user.id, description.strip(), tags, document['public_id'], db)
+    storageDir = os.path.abspath(os.path.dirname(__file__) + "/../../storage")
 
-    return {"document": document, "message": "Document successfully uploaded"}
+    documentFilename = storageDir + "/" + documentPublicId + ".pdf"
+
+    async with aiofiles.open(documentFilename, 'wb') as out_file:
+        content = await file.read()
+        await out_file.write(content)
+
+    document = await repository_documents.create_document(
+        current_user.id,
+        description.strip(),
+        tags,
+        documentPublicId,
+        db
+    )
+
+    return {
+        "document": document,
+        "message": "Document successfully uploaded"
+    }
 
 
-@router.get("/", response_model=list[DocumentPublic], description="Get all documents",
-            )#dependencies=[Depends(RateLimiter(times=30, seconds=60))]
-
+@router.get(
+    "/",
+    response_model=list[DocumentPublic],
+    description="Get all documents",
+)
+#dependencies=[Depends(RateLimiter(times=30, seconds=60))]
 async def get_documents(
         skip: int = 0,
         limit: int = Query(default=10, ge=1, le=100),
@@ -99,9 +128,16 @@ async def get_documents(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_active_user)
 ) -> Any:
-
-    return await repository_documents.get_documents(skip, limit, description, tags, document_id, user_id, sort_by, db)
-
+    return await repository_documents.get_documents(
+        skip,
+        limit,
+        description,
+        tags,
+        document_id,
+        user_id,
+        sort_by,
+        db
+    )
 
 @router.get("/{document_id}", response_model=DocumentPublic)
 async def get_document(
@@ -116,6 +152,20 @@ async def get_document(
 
     return document
 
+@router.get("/content/{document_id}")
+async def get_document(
+        document_id: int,
+        db: Session = Depends(get_db),
+) -> Any:
+
+    document = await repository_documents.get_document_by_id(document_id, db)
+    if document is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")
+
+    storageDir = os.path.abspath(os.path.dirname(__file__) + "/../../storage")
+    documentFilename = storageDir + "/" + document.public_id + ".pdf"
+
+    return FileResponse(documentFilename, filename="document.pdf")
 
 @router.patch("/", response_model=DocumentPublic, )# dependencies=[Depends(RateLimiter(times=10, seconds=60))]
 async def update_document_data(

@@ -2,7 +2,8 @@ token = localStorage.getItem("accessToken")
 
 documents = document.getElementById("documents")
 
-const baseUrl = 'https://svitlogram.fly.dev'
+//const baseUrl = 'https://svitlogram.fly.dev';
+const baseUrl = '';
 
 const urlParams = new URLSearchParams(window.location.search);
 const message = urlParams.get("message");
@@ -35,9 +36,9 @@ const getUserById = async (user_id) => {
     redirect: 'follow'
   };
 
-  const respons = await fetch(`${baseUrl}/api/users/users_id/${user_id}`, requestOptions)
-  if (respons.status === 200) {
-    result = await respons.json()
+  const response = await fetch(`${baseUrl}/api/users/users_id/${user_id}`, requestOptions)
+  if (response.status === 200) {
+    result = await response.json()
     return result;
   }
 }
@@ -61,7 +62,47 @@ const getUserByUserName = async (username) => {
   }
 }
 
-const form = document.forms[0]
+document.getElementById('uploadForm').addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  if (!this.checkValidity()) {
+    this.reportValidity();
+  }
+
+  if (this.elements['file'].files.length === 0) {
+      return;
+  }
+
+  if (this.elements['description'].value === '') {
+      alert('Please, define description');
+      return;
+  }
+
+  const file = this.elements['file'].files[0];
+  const description = this.elements['description'].value;
+
+  var data = new FormData();
+  data.append('file', file);
+  data.append('description', description);
+
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${token}`
+    },
+    redirect: 'follow',
+    body: data
+  };
+
+  const response = await fetch(`${baseUrl}/api/documents/`, requestOptions)
+  if (response.status == 201) {
+    window.location = `/static/client_rest/documents.html`
+  } else {
+    alert("File upload error");
+  }
+});
+
+const form = document.getElementById('searchForm');
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault()
@@ -70,9 +111,9 @@ form.addEventListener("submit", async (e) => {
     const encodedSearchValue = encodeURIComponent(searchValue);
     window.location = `/static/client_rest/search_info.html?search=${encodedSearchValue}`;
   }
-})
+});
 
-const form1 = document.forms[1]
+const form1 = document.getElementById('open_ai_form');
 
 form1.addEventListener("submit", async (e) => {
   e.preventDefault()
@@ -101,9 +142,9 @@ form1.addEventListener("submit", async (e) => {
     getAnswer()
   }
 
-})
+});
 
-const getImeges = async () => {
+const getDocuments = async () => {
   const myHeaders = new Headers();
   myHeaders.append(
     "Authorization",
@@ -115,77 +156,61 @@ const getImeges = async () => {
     redirect: 'follow'
   };
 
-
-  const response = await fetch(`${baseUrl}/api/documents`, requestOptions)
+  const response = await fetch(`${baseUrl}/api/documents/?sort_by=date_added_desc`, requestOptions)
   if (response.status === 200) {
-    result = await response.json()
-    documents.innerHTML = ""
+    result = await response.json();
+    documents.innerHTML = "";
 
-    for (const document of result) {
-      const img = document.createElement('img');
-      img.src = document.url;
-      const user = document.user_id ? await getUserById(document.user_id) : null;
-
-      const avatar = document.createElement('img');
-      avatar.src = user.avatar;
-      avatar.style.borderRadius = '20%';
-      avatar.style.width = '30px';
-      avatar.style.height = '30px';
+    for (const doc of result) {
+      const documentUrl = document.createElement('a');
+      documentUrl.href = doc.url;
+      documentUrl.innerHTML = doc.url;
+      const user = doc.user_id ? await getUserById(doc.user_id) : null;
 
       const el = document.createElement('div');
       el.className = 'modal-content rounded-4 shadow';
 
       const avatarUserNameDiv = document.createElement('div');
       avatarUserNameDiv.className = "author mb-2 mt-2"
-      const avatarSpan = document.createElement('span');
-      avatarSpan.innerHTML = avatar.outerHTML;
-
 
       const authorLink = document.createElement('a');
       authorLink.className = 'author';
       authorLink.textContent = user.username;
       authorLink.href = `user_profile.html?username=${user.username}`
-      avatarUserNameDiv.appendChild(avatarSpan);
       avatarUserNameDiv.appendChild(authorLink);
 
-      const photoDiv = document.createElement('div');
-      const photoLink = document.createElement('a');
-      photoLink.className = 'photo';      
-      photoLink.innerHTML = img.outerHTML;
-      photoLink.style.width = '200px';
-      photoDiv.appendChild(photoLink);
+      const docDiv = document.createElement('div');
+      docDiv.appendChild(documentUrl);
 
       const documentsDescriptionDiv = document.createElement('div');
       documentsDescriptionDiv.className = "some_class mb-2"
       const descriptionSpan = document.createElement('span');
-      descriptionSpan.textContent = document.description;
-      documentsDescriptionDiv.appendChild(descriptionSpan)
-
-
-      }
-
-
+      descriptionSpan.textContent = doc.description;
+      documentsDescriptionDiv.appendChild(descriptionSpan);
 
       const topicsDiv = document.createElement('div');
       topicsDiv.className = 'node__topics';
       topicsDiv.textContent = 'Tags: ';
+      topicsDiv.textContent = 'Tags: ';
 
-      for (const tag of document.tags) {
-        const tagLink = document.createElement('a');
-        tagLink.className = 'btn mb-2 mb-md-0 btn-outline-danger btn-sm';
-        tagLink.textContent = tag.name;
-        topicsDiv.appendChild(tagLink);
+      if (document.tags) {
+          for (const tag of document.tags) {
+            const tagLink = document.createElement('a');
+            tagLink.className = 'btn mb-2 mb-md-0 btn-outline-danger btn-sm';
+            tagLink.textContent = tag.name;
+            topicsDiv.appendChild(tagLink);
+          }
+          documentsDescriptionDiv.appendChild(topicsDiv)
       }
-      documentsDescriptionDiv.appendChild(topicsDiv)
 
       el.appendChild(avatarUserNameDiv);
-      el.appendChild(photoDiv);
-      el.appendChild(documetsDescriptionDiv);
+      el.appendChild(docDiv);
+      el.appendChild(documentsDescriptionDiv);
 
       documents.appendChild(el);
-
     }
   }
 }
+
 getDocuments();
 
