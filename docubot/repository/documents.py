@@ -122,3 +122,10 @@ async def search_documents(data: str, db: Session) -> list[Type[Document]]:
 
     return documents
 
+
+async def count_documents_by_user_id(user_id: int, db: Session) -> int:
+
+    documents_count = db.query(Document).count()
+
+    return documents_count
+

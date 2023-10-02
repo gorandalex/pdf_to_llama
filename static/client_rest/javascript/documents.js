@@ -1,17 +1,7 @@
 token = localStorage.getItem("accessToken")
 
 documents = document.getElementById("documents")
-//// new code
-//const uploadForm = document.getElementById('uploadForm');
-//
-//uploadForm.addEventListener('submit', async function(e) {
-//  e.preventDefault();
-//
-//  if (uploadForm.elements['file'].files.length > 5) {
-//    alert('You can upload no more than 5 files');
-//    return;
-//  }
-//// end of new code
+
 ////const baseUrl = 'https://svitlogram.fly.dev';
 const baseUrl = '';
 
@@ -48,7 +38,7 @@ const getUserById = async (user_id) => {
 
   const response = await fetch(`${baseUrl}/api/users/users_id/${user_id}`, requestOptions)
   if (response.status === 200) {
-    result = await response.json()
+    const result = await response.json()
     return result;
   }
 }
@@ -67,12 +57,13 @@ const getUserByUserName = async (username) => {
 
   const response = await fetch(`${baseUrl}/api/users/${username}`, requestOptions)
   if (response.status === 200) {
-    result = await response.json()
+    const result = await response.json()
     return result;
   }
 }
+const uploadForm = document.getElementById('uploadForm');
 
-document.getElementById('uploadForm').addEventListener("submit", async function (e) {
+uploadForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
   if (!this.checkValidity()) {
@@ -126,7 +117,7 @@ const getDocuments = async () => {
 
   const response = await fetch(`${baseUrl}/api/documents/?sort_by=date_added_desc`, requestOptions)
   if (response.status === 200) {
-    result = await response.json();
+    const result = await response.json();
     documents.innerHTML = "";
 
     for (const doc of result) {
@@ -176,6 +167,9 @@ const getDocuments = async () => {
       el.appendChild(documentsDescriptionDiv);
 
       documents.appendChild(el);
+    }
+    if (result.length === 5) {
+        uploadForm.setAttribute("hidden", "hidden");
     }
   }
 }
