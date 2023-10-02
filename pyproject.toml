@@ -30,6 +30,8 @@ asynctest = "^0.13.0"
 psycopg2 = "^2.9.6"
 gunicorn = "^20.1.0"
 openai = "^0.27.8"
+pypdf = "^3.16.2"
+langchain = "^0.0.305"
 
 
 [tool.poetry.group.test.dependencies]

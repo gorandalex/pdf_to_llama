@@ -1,5 +1,5 @@
-
 import enum
+import os
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session, aliased
@@ -8,6 +8,7 @@ from docubot.database.models import Document, Tag
 from typing import Optional, Type
 
 from .tags import get_or_create_tags
+from langchain.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader
 
 
 class SortMode(enum.Enum):
@@ -31,7 +32,7 @@ async def get_document_by_id(document_id: int, db: Session) -> Document:
         select(Document)
         .filter(Document.id == document_id)
     )
-    
+
 
 async def create_document(user_id: int, description: str, tags: list[str], public_id: str, db: Session) -> Document:
     """
@@ -118,7 +119,33 @@ async def get_documents(
 async def search_documents(data: str, db: Session) -> list[Type[Document]]:
 
     documents = db.query(Document).filter(Document.description.ilike(f"%{data}%") |
-                                       Document.tags.any(Tag.name.ilike(f"%{data}%"))).all()
+                                          Document.tags.any(Tag.name.ilike(f"%{data}%"))).all()
 
     return documents
 
+
+async def extract_text_from_docs(directory_path: str):
+    """
+    Process documents located in the specified directory and convert them to text.
+
+    :param directory_path: str: The path to the directory where the documents are located.
+    :return: list of str: A list of text data extracted from the processed documents.
+    """
+    #  user_documents = db.query(Document).filter(Document.user_id == user_id).all()
+    text_data = []
+
+    for file in os.listdir(directory_path):
+        if file.endswith(".pdf"):
+            pdf_path = os.path.join(directory_path, file)
+            pdf_loader = PyPDFLoader(pdf_path)
+            text_data.extend(pdf_loader.load())
+        elif file.endswith('.docx') or file.endswith('.doc'):
+            doc_path = os.path.join(directory_path, file)
+            doc_loader = Docx2txtLoader(doc_path)
+            text_data.extend(doc_loader.load())
+        elif file.endswith('.txt'):
+            text_path = os.path.join(directory_path, file)
+            txt_loader = TextLoader(text_path)
+            text_data.extend(txt_loader.load())
+
+    return text_data

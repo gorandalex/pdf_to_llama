@@ -1,5 +1,6 @@
 import asyncio
 import mimetypes
+import os
 from typing import Optional, Any, List
 
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, status, Query, Body
@@ -22,7 +23,7 @@ allowed_content_types_upload = [
     ".pdf",
     ".txt",
     ".docx"
-    ]
+]
 
 
 @router.post(
@@ -30,13 +31,13 @@ allowed_content_types_upload = [
     dependencies=[Depends(RateLimiter(times=10, seconds=60))]
 )
 async def upload_document(
-        file: UploadFile = File(), 
+        file: UploadFile = File(),
         description: str = Form(min_length=10, max_length=1200),
         tags: Optional[list[str]] = Form(None),
         # tags = Form(None),
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_active_user),
-) -> Any:  
+) -> Any:
     """
     The upload_document function is used to upload a document file to the vector DB server.
     The function takes in a file, description and tags as parameters. The file parameter is of type UploadFile which
@@ -56,11 +57,11 @@ async def upload_document(
     #     tags = {tag.strip() for tag in tags.split(',')}
     # except:
     #     ...
-    
+
     if mimetypes.guess_extension(file.content_type,) not in allowed_content_types_upload:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                             detail=f"Invalid file type. Only allowed {allowed_content_types_upload}.")
-    
+
     tags = repository_tags.get_list_tags(tags)
 
     if tags and len(tags) > 5:
@@ -117,7 +118,7 @@ async def get_document(
     return document
 
 
-@router.patch("/", response_model=DocumentPublic, )# dependencies=[Depends(RateLimiter(times=10, seconds=60))]
+@router.patch("/", response_model=DocumentPublic, )  # dependencies=[Depends(RateLimiter(times=10, seconds=60))]
 async def update_document_data(
         document_id: int = Body(ge=1),
         description: str = Body(min_length=10, max_length=1200),
@@ -179,3 +180,16 @@ async def search_documents(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
 
     return documents
+
+
+@router.get("/extract_text")
+async def extract_text_from_documents(
+        directory_path: str,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_active_user)
+) -> Any:
+    if not os.path.exists(directory_path):
+        raise HTTPException(status_code=404, detail="Directory not found")
+
+    text_data = await repository_documents.extract_text_from_docs(directory_path)
+    return {"text_data": text_data}
