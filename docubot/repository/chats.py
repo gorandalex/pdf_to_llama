@@ -5,17 +5,21 @@ from sqlalchemy.orm import Session
 from docubot.database.models.chats import Chat
 
 
-async def create_chat(user_id: int, document_id: int, question: str, db: Session) -> Chat:
-
+async def create_chat(
+        user_id: int,
+        document_id: int,
+        question: str,
+        answer: str,
+        db: Session
+) -> Chat:
     chat = Chat(
-            user_id=user_id,
-            document_id=document_id,
-            question=question,
+        user_id=user_id,
+        document_id=document_id,
+        question=question,
+        answer=answer
+    )
 
-
-        )
     db.add(chat)
-
     db.commit()
     db.refresh(chat)
 
