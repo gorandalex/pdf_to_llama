@@ -6,9 +6,10 @@ from sqlalchemy.orm import Session
 
 from docubot.database.connect import get_db
 from docubot.database.models import UserRole, User
-from docubot.schemas.chats import ChatBase, ChatPublic
+from docubot.schemas.chats import ChatPublic, CreateChatRequest, CreateChatResult
 from docubot.repository import chats as repository_chats
 from docubot.repository import documents as repository_documents
+from docubot.services.llm import send_message_to_llm
 from docubot.utils.filters import UserRoleFilter
 from docubot.services.auth import get_current_active_user
 
@@ -17,40 +18,51 @@ router = APIRouter(prefix='/documents/chats', tags=["Document chats"])
 
 @router.post("/", response_model=ChatPublic, status_code=status.HTTP_201_CREATED)
 async def create_chat(
-        body: ChatBase,
+        document_id: int,
+        body: CreateChatRequest,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_active_user)
 ) -> Any:
 
-    document = await repository_documents.get_document_by_id(body.document_id, db)
+    document = await repository_documents.get_document_by_id(document_id, db)
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")
 
+    # todo send message to llm
+    answer = send_message_to_llm(body.question)
+
     return await repository_chats.create_chat(
-        current_user.id, body.document_id, body.question.strip(), db
+        current_user.id,
+        document_id,
+        body.question.strip(),
+        answer,
+        db
     )
 
 
 @router.get(
     '/',
     response_model=List[ChatPublic],
-    description='No more than 10 requests per minute',
-    dependencies=[Depends(RateLimiter(times=10, seconds=60))]
+    description='No more than 100 requests per minute',
+    dependencies=[Depends(RateLimiter(times=100, seconds=60))]
 )
 async def get_chats_by_document_or_user_id(
         document_id: Optional[int] = None,
-        user_id: Optional[int] = None,
         skip: int = 0,
-        limit: int = 10, db: Session = Depends(get_db),
+        limit: int = 10,
+        db: Session = Depends(get_db),
         current_user: User = Depends(get_current_active_user)
 ) -> Any:
-
-    if user_id is None and document_id is None:
+    if document_id is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Both user_id or document_id must be provided")
+                            detail="Document_id must be provided")
 
     return await repository_chats.get_chats_by_document_or_user_id(
-        user_id, document_id, skip, limit, db
+        current_user.id,
+        document_id,
+        skip,
+        limit,
+        db
     )
 
 

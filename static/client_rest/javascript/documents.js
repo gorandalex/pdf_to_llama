@@ -121,29 +121,30 @@ const getDocuments = async () => {
     documents.innerHTML = "";
 
     for (const doc of result) {
-      const documentUrl = document.createElement('a');
-      documentUrl.href = doc.url;
-      documentUrl.innerHTML = doc.url;
       const user = doc.user_id ? await getUserById(doc.user_id) : null;
 
-      const el = document.createElement('div');
-      el.className = 'modal-content rounded-4 shadow';
-
-      const avatarUserNameDiv = document.createElement('div');
-      avatarUserNameDiv.className = "author mb-2 mt-2"
-
-      const chatLink = document.createElement('a');
-      chatLink.className = 'chat';
-      chatLink.textContent = doc.description;
-      chatLink.href = `chats.html?id=${doc.id}`
-      avatarUserNameDiv.appendChild(chatLink);
+      const documentUrl = document.createElement('a');
+      documentUrl.href = doc.url;
+      documentUrl.innerHTML = "Download";
 
       const docDiv = document.createElement('div');
       docDiv.appendChild(documentUrl);
 
+      const chatLink = document.createElement('a');
+      chatLink.className = 'chat';
+      chatLink.textContent = doc.description;
+      chatLink.href = '#'
+      chatLink.setAttribute('data-doc-id', doc.id);
+
+      const avatarUserNameDiv = document.createElement('div');
+      avatarUserNameDiv.className = "author mb-2 mt-2"
+      avatarUserNameDiv.appendChild(chatLink);
+
       const documentsDescriptionDiv = document.createElement('div');
       documentsDescriptionDiv.className = "some_class mb-2"
 
+      const listItem = document.createElement('div');
+      listItem.className = 'list-group-item';
 
       const topicsDiv = document.createElement('div');
       topicsDiv.className = 'node__topics';
@@ -160,16 +161,90 @@ const getDocuments = async () => {
           documentsDescriptionDiv.appendChild(topicsDiv)
       }
 
-      el.appendChild(avatarUserNameDiv);
-      el.appendChild(docDiv);
-      el.appendChild(documentsDescriptionDiv);
+      listItem.appendChild(avatarUserNameDiv);
+      listItem.appendChild(docDiv);
+      listItem.appendChild(documentsDescriptionDiv);
 
-      documents.appendChild(el);
+      documents.appendChild(listItem);
     }
     if (result.length === 5) {
         uploadForm.setAttribute("hidden", "hidden");
     }
   }
 }
+
+$(document.body).on('click', '.chat', async function(e) {
+    const docId = $(this).data('doc-id');
+
+    $('#chatMessages').data('doc-id', docId).empty();
+    $('#chatContainer').removeAttr('hidden');
+    $('#selectDocumentMessage').attr('hidden', true);
+
+    await loadChatHistory(docId);
+});
+
+const loadChatHistory = async function (docId) {
+  const requestOptions = {
+    method: 'GET',
+    headers: {
+        "Authorization": `Bearer ${token}`
+    },
+    redirect: 'follow'
+  };
+
+  const response = await fetch(`${baseUrl}/api/documents/chats/?document_id=${docId}&skip=0&limit=1000`, requestOptions)
+  if (response.status === 200) {
+    const result = await response.json();
+
+    for (let i in result) {
+        printChatMessage(result[i].question);
+        printChatMessage(result[i].answer);
+    }
+  }
+}
+
+$('#sendMessageForm').on('submit', async function(e) {
+    e.preventDefault();
+
+    var $messageInput = $('#messageInput');
+    var messageText = $messageInput.val();
+
+    const documentId = $('#chatMessages').data('doc-id');
+
+    if (messageText.trim().length >= 5) {
+        printChatMessage(messageText);
+        $messageInput.val('');
+
+        await sendMessage(documentId, messageText);
+    }
+});
+
+const printChatMessage = function (messageText) {
+    var $chatMessages = $('#chatMessages');
+
+    var $li = $('<li>');
+    $li.addClass('mb-2');
+    $li.html(messageText);
+    $chatMessages.append($li);
+}
+
+const sendMessage = async function (documentId, question) {
+    const requestOptions = {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    redirect: 'follow',
+    body: JSON.stringify({question})
+  };
+
+  const response = await fetch(`${baseUrl}/api/documents/chats/?document_id=${documentId}`, requestOptions)
+  if (response.status === 201) {
+    const result = await response.json();
+    printChatMessage(result.answer);
+  }
+};
 
 getDocuments();
