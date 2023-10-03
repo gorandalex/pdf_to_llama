@@ -10,7 +10,7 @@ from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.orm import Session
 
 from docubot.database.connect import get_db
-from docubot.database.models import User, UserRole
+from docubot.database.models import User, UserRole, UserLevel
 from docubot.repository import users as repository_users, documents as repository_documents
 from docubot.schemas.user import UserPublic, ProfileUpdate
 
@@ -118,6 +118,39 @@ async def change_user_role(
 
     return await repository_users.user_update_role(user, body.role, db)  # noqa
 
+
+@router.post(
+    "/change-level",
+    response_model=user_schemas.UserPublic,
+    dependencies=[
+        Depends(UserRoleFilter(UserRole.admin)),
+        Depends(HTTPBearer())
+    ]
+)
+async def change_user_level(
+        body: user_schemas.ChangeLevel,
+        db: Session = Depends(get_db),
+        _: User = Depends(get_current_active_user)
+) -> Any:
+    """
+    The change_user_level function is used to change the level of a user.
+
+    :param body: user_schemas.ChangeLevel: Validate the request body
+    :param db: Session: Pass the database session to the repository layer
+    :param _: User: Get the current user
+    :return: A dictionary with the user_id and level
+    """
+    if body.level not in ['bronze', 'silver', 'gold']:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Level not found")
+
+    user = await repository_users.get_user_by_id(body.user_id, db)
+    print(user)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if user.level == body.level:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This user already has this level installed")
+
+    return await repository_users.user_update_level(user, body.level, db)  # noqa
 
 @router.get("/{username}", response_model=user_schemas.UserProfile,
             dependencies=[Depends(RateLimiter(times=10, seconds=60))])
@@ -283,6 +316,7 @@ async def get_users_with_filter(
     first_name: Optional[str] = None,
     last_name: Optional[str] = None,
     role: Optional[UserRole] = None,
+    level: Optional[UserLevel] = None,
     created_at_start: Optional[str] = "2023-01-01",
     created_at_end: Optional[str] = datetime.today().strftime("%Y-%m-%d"),
     has_documents: Optional[bool] = None,
@@ -305,7 +339,7 @@ async def get_users_with_filter(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=f"Invalid date format: {created_at_end}. Use format: YYYY-MM-DD.")
 
-    return await repository_users.get_users_with_filter(db, skip, limit, first_name, last_name, role, 
+    return await repository_users.get_users_with_filter(db, skip, limit, first_name, last_name, role, level, 
                                                         created_at_start, created_at_end, has_documents)
 
 
