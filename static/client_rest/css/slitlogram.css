@@ -3,6 +3,7 @@ body {
   height: 100%;
 }
 
+
 body {
   align-items: center;
   padding-bottom: 40px;
@@ -29,8 +30,8 @@ body {
 
 
 .btn-outline-danger {
---bs-btn-color: #E38800;
---bs-btn-border-color: #E38800;
+--bs-btn-color: #FBC756;
+--bs-btn-border-color: #FBC756;
 --bs-btn-hover-color: #fff;
 --bs-btn-hover-bg: #E38800;
 --bs-btn-hover-border-color: #E38800;
@@ -45,11 +46,37 @@ body {
 --bs-gradient: none;
 }
 
+
 .card {
-background-color: #D1D5DB;
+    background-color: #D1D5DB;
 }
 
 
 .form-control {
-background-color: #D1D5DB;
-}}
+    background-color: #D1D5DB;
+}
+
+
+.input[type="file"] {
+    background-color: #FBC756;
+    color: #000;
+}
+
+
+a:link {
+    color: #040404;
+}
+
+
+a:hover {
+    color: #FBC756;
+}
+
+
+.list-group-item,
+.chat,
+.some_class {
+    color: #040404;
+    background-color: #D1D5DB;
+}
+
