@@ -26,3 +26,4 @@
 /Procfile
 
 /.env
+.vscode/settings.json
