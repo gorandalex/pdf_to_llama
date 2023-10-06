@@ -18,6 +18,12 @@ class UserRole(StrEnum):
     user = enum.auto()
 
 
+class UserLevel(enum.Enum):
+    bronze: str = 'bronze'
+    silver: str = 'silver'
+    gold: str = 'gold'
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -28,6 +34,7 @@ class User(Base):
     first_name: Mapped[str] = mapped_column(String(255), index=True)
     last_name: Mapped[str] = mapped_column(String(255), index=True)
     role: Mapped[UserRole] = mapped_column(ENUM(UserRole, name='user_role'))
+    level = Column('level', Enum(UserLevel), default=UserLevel.bronze)
     refresh_token: Mapped[Optional[str]] = mapped_column(String(255))
     email_verified: Mapped[bool] = mapped_column(default=False)
     is_active: Mapped[bool] = mapped_column(default=True)

@@ -6,7 +6,7 @@ from typing import Optional, List
 
 from pydantic import EmailStr, constr
 
-from docubot.database.models import UserRole
+from docubot.database.models import UserRole, UserLevel
 from docubot.schemas.documents import DocumentPublic
 from .core import DateTimeModelMixin, IDModelMixin, CoreModel
 
@@ -20,6 +20,7 @@ class UserBase(CoreModel):
     first_name: str
     last_name: str
     role: str
+    level: UserLevel = "bronze"
     email_verified: bool
 
 
@@ -71,6 +72,11 @@ class ChangeRoleEnum(StrEnum):
 class ChangeRole(CoreModel):
     user_id: int
     role: ChangeRoleEnum
+
+
+class ChangeLevel(CoreModel):
+    user_id: int
+    level: str
 
 
 class UserProfile(IDModelMixin):

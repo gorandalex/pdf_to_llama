@@ -13,6 +13,7 @@ from docubot.database.models import UserRole, User
 from docubot.schemas.chats import ChatPublic, CreateChatRequest, CreateChatResult
 from docubot.repository import chats as repository_chats
 from docubot.repository import documents as repository_documents
+from docubot.repository import users_tokens as repository_users_tokens
 from docubot.services.llm import send_message_to_llm
 from docubot.utils.filters import UserRoleFilter
 from docubot.services.auth import get_current_active_user
@@ -34,6 +35,11 @@ async def create_chat(
     document = await repository_documents.get_document_by_id(document_id, db)
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")
+    
+    total_user_tokens = await repository_users_tokens.get_total_user_tokens(current_user.id, db)
+    if total_user_tokens > 10000:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="You've used all daily tokens. We are waiting for you tomorrow")
 
     path_to_vectorstore = os.path.join(BASE_DIR, f"{document.public_id}.pkl")
     if os.path.exists(path_to_vectorstore):
