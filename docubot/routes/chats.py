@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 import pickle
 import os
 from dotenv import load_dotenv
+from config import BASE_DIR
 
 from docubot.database.connect import get_db
 from docubot.database.models import UserRole, User
@@ -15,6 +16,7 @@ from docubot.repository import documents as repository_documents
 from docubot.services.llm import send_message_to_llm
 from docubot.utils.filters import UserRoleFilter
 from docubot.services.auth import get_current_active_user
+
 
 load_dotenv()
 
@@ -33,8 +35,9 @@ async def create_chat(
     if document is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")
 
-    if os.path.exists(f"{document_id}.pkl"):
-        with open(f"{document_id}.pkl","rb") as f:
+    path_to_vectorstore = os.path.join(BASE_DIR, f"{document.public_id}.pkl")
+    if os.path.exists(path_to_vectorstore):
+        with open(path_to_vectorstore,"rb") as f:
             vectorstore = pickle.load(f)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")

@@ -14,4 +14,4 @@ def send_message_to_llm(vectorstore, question: str) -> str:
 
         with get_openai_callback() as cb:
             response = chain.run(input_documents=docs, question=question)
-            return response
+            return response, cb
