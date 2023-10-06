@@ -18,6 +18,8 @@ import os
 import aiofiles
 from fastapi.responses import FileResponse
 
+from docubot.services.pdf_to_vectorstore import pdf_to_vectorstore
+
 FILE_MORE_5MB = 5*1024*1024
 FILE_MORE_50MB = 50*1024*1024
 
@@ -118,6 +120,8 @@ async def upload_document(
     async with aiofiles.open(documentFilename, 'wb') as out_file:
         content = await file.read()
         await out_file.write(content)
+
+    await pdf_to_vectorstore(documentFilename)
 
     document = await repository_documents.create_document(
         current_user.id,

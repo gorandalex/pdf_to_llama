@@ -70,24 +70,24 @@ async def ban_ips(request: Request, call_next: Callable):
     return response
 
 
-@app.on_event("startup")
-async def startup():
-    """
-    The startup function is called when the application starts up.
-    It's a good place to initialize things that are used by the application, such as databases or caches.
-    
-    :return: A coroutine, so we need to run it
-    :doc-author: Trelent
-    """
-    # await FastAPILimiter.init(
-    #     await redis.Redis(host=settings.redis_host, port=settings.redis_port, password=settings.redis_password,
-    #                       db=0, encoding="utf-8", decode_responses=True)
-    # )
-    r = await redis.Redis(host=settings.redis_host, port=settings.redis_port,
-
-                           db=0, encoding="utf-8", decode_responses=True, password=settings.redis_password) 
-
-    await FastAPILimiter.init(r)
+# @app.on_event("startup")
+# async def startup():
+#     """
+#     The startup function is called when the application starts up.
+#     It's a good place to initialize things that are used by the application, such as databases or caches.
+#
+#     :return: A coroutine, so we need to run it
+#     :doc-author: Trelent
+#     """
+#     # await FastAPILimiter.init(
+#     #     await redis.Redis(host=settings.redis_host, port=settings.redis_port, password=settings.redis_password,
+#     #                       db=0, encoding="utf-8", decode_responses=True)
+#     # )
+#     r = await redis.Redis(host=settings.redis_host, port=settings.redis_port,
+#
+#                            db=0, encoding="utf-8", decode_responses=True, password=settings.redis_password)
+#
+#     await FastAPILimiter.init(r)
 
 
 templates = Jinja2Templates(directory="templates")
@@ -126,7 +126,8 @@ def healthchecker(db: Session = Depends(get_db)):
 
 
 app.include_router(router, prefix=API_PREFIX)
+# app.add_middleware(SessionMiddleware, secret_key="some-random-secret-key")
 
 
 if __name__ == '__main__':
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", reload=True)

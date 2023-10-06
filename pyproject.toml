@@ -35,6 +35,10 @@ pypdf2 = "^3.0.1"
 langchain = "^0.0.308"
 faiss-cpu = "^1.7.4"
 tiktoken = "^0.5.1"
+langchain = "^0.0.309"
+pypdf = "^3.16.2"
+pathlib = "^1.0.1"
+environs = "^9.5.0"
 
 
 [tool.poetry.group.test.dependencies]
