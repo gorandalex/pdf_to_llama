@@ -18,6 +18,8 @@ import os
 import aiofiles
 from fastapi.responses import FileResponse
 
+from docubot.services.pdf_to_vectorstore import pdf_to_vectorstore
+
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
 allowed_content_types_upload = [
@@ -102,6 +104,8 @@ async def upload_document(
     async with aiofiles.open(documentFilename, 'wb') as out_file:
         content = await file.read()
         await out_file.write(content)
+
+    await pdf_to_vectorstore(documentFilename)
 
     document = await repository_documents.create_document(
         current_user.id,
