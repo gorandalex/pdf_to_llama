@@ -15,6 +15,8 @@ from fastapi_limiter import FastAPILimiter
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+import faiss
+
 
 
 from docubot.database.connect import get_db

@@ -67,7 +67,7 @@ async def upload_document(
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                             detail=f"Invalid file type. Only allowed {allowed_content_types_upload}.")
     
-    size = os.path.getsize(file)
+    size = file.size
 
     if size > FILE_MORE_50MB:
         if current_user.level in ['bronze', 'silver']:

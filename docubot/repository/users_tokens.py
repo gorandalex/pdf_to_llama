@@ -26,7 +26,7 @@ async def get_total_user_tokens(user_id, db: Session):
         db.add(user_tokens)
         db.commit()
         db.refresh(user_tokens)
-    return db.query(UserToken).filter(UserToken.user_id== user_id).first()
+    return db.query(UserToken).filter(UserToken.user_id== user_id).first().total_user_tokens
 
 
 async def add_user_tokens(user_id, user_tokens, db: Session):
@@ -52,14 +52,15 @@ async def add_user_tokens(user_id, user_tokens, db: Session):
         db.commit()
         db.refresh(total_user_tokens)
 
-    if datetime.now() - user_tokens.started_at > timedelta(hours=24):
-        total_user_tokens.total_user_tokens = user_tokens
-        total_user_tokens.started_at = datetime.now()
+    if datetime.now() - total_user_tokens[0].started_at > timedelta(hours=24):
+        total_user_tokens[0].total_user_tokens = user_tokens
+        total_user_tokens[0].started_at = datetime.now()
 
     else:
-        if total_user_tokens.total_user_tokens == 0:
-            total_user_tokens.started_at = datetime.now()
-        total_user_tokens.total_user_tokens += user_tokens
+        if total_user_tokens[0].total_user_tokens == 0:
+            total_user_tokens[0].started_at = datetime.now()
+        total_user_tokens[0].total_user_tokens += user_tokens
 
+    db.commit()
     return db.query(UserToken).filter(UserToken.user_id==user_id).first()
 

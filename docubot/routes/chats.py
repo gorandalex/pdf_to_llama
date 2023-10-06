@@ -3,6 +3,7 @@ from typing import List, Optional, Any
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.orm import Session
+from langchain.vectorstores import FAISS
 import pickle
 import os
 from dotenv import load_dotenv
@@ -14,7 +15,7 @@ from docubot.schemas.chats import ChatPublic, CreateChatRequest, CreateChatResul
 from docubot.repository import chats as repository_chats
 from docubot.repository import documents as repository_documents
 from docubot.repository import users_tokens as repository_users_tokens
-from docubot.services.llm import send_message_to_llm
+from docubot.services.llm import send_message_to_llm, vectorise_file
 from docubot.utils.filters import UserRoleFilter
 from docubot.services.auth import get_current_active_user
 
@@ -46,12 +47,13 @@ async def create_chat(
         with open(path_to_vectorstore,"rb") as f:
             vectorstore = pickle.load(f)
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")
+        vectorstore = await vectorise_file(os.path.join(BASE_DIR,'storage', f"{document.public_id}.pdf"))
+        # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")
     
     # todo send message to llm
-    answer, cb = send_message_to_llm(vectorstore, body.question)
+    answer, cb = await send_message_to_llm(vectorstore, body.question)
     
-    repository_users_tokens.add_user_tokens(user_id=current_user.id, user_tokens=cb, db=db)
+    users_tokens = await repository_users_tokens.add_user_tokens(user_id=current_user.id, user_tokens=cb.total_tokens, db=db)
 
     return await repository_chats.create_chat(
         current_user.id,
