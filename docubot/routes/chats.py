@@ -15,9 +15,10 @@ from docubot.schemas.chats import ChatPublic, CreateChatRequest, CreateChatResul
 from docubot.repository import chats as repository_chats
 from docubot.repository import documents as repository_documents
 from docubot.repository import users_tokens as repository_users_tokens
-from docubot.services.llm import send_message_to_llm, vectorise_file
+from docubot.services.llm import send_message_to_llm
 from docubot.utils.filters import UserRoleFilter
 from docubot.services.auth import get_current_active_user
+from docubot.services.pdf_to_vectorstore import pdf_to_vectorstore
 
 
 load_dotenv()
@@ -47,7 +48,7 @@ async def create_chat(
         with open(path_to_vectorstore,"rb") as f:
             vectorstore = pickle.load(f)
     else:
-        vectorstore = await vectorise_file(os.path.join(BASE_DIR,'storage', f"{document.public_id}.pdf"))
+        vectorstore = await pdf_to_vectorstore(os.path.join(BASE_DIR,'storage', f"{document.public_id}.pdf"))
         # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")
     
     # todo send message to llm

@@ -4,12 +4,12 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.document_loaders import TextLoader, PyPDFLoader
-from environs import Env
 import openai
+# from environs import Env
 
-env = Env()
-env.read_env('.env')
-openai.api_key = env.str('OPENAI_API_KEY')
+# env = Env()
+# env.read_env('.env')
+# openai.api_key = env.str('OPENAI_API_KEY')
 
 
 async def pdf_to_vectorstore(file_path):
@@ -23,7 +23,7 @@ async def pdf_to_vectorstore(file_path):
 
     embeddings = OpenAIEmbeddings()
     # db_name = 'vector_db'
-    db = FAISS.from_documents(file_path, embeddings)
+    db = FAISS.from_documents(chunks, embeddings)
 
     with open(f"{file_path[:-4]}.pkl", "wb") as f:
         pickle.dump(db, f)
@@ -35,4 +35,5 @@ async def pdf_to_vectorstore(file_path):
     #     vectorstore.save_local(db_name)
     #     print('DB created')
 
-    return 'Done'
+    return db
+
