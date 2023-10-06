@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from docubot.database.models import UserRole, User
 from docubot.database.connect import get_db
 
-from docubot.schemas.users_tokens import UserTokensModel, UserTokensResponse
-from docubot.repository import repository_users_tokens
+from docubot.schemas.users_tokens import UserTokensModel, UserTokensResponse 
+from docubot.repository import users_tokens as repository_users_tokens
 
 from docubot.utils.filters import UserRoleFilter
 from docubot.services.auth import get_current_active_user

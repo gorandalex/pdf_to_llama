@@ -41,7 +41,7 @@ async def create_chat(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="You've used all daily tokens. We are waiting for you tomorrow")
 
-    path_to_vectorstore = os.path.join(BASE_DIR, f"{document.public_id}.pkl")
+    path_to_vectorstore = os.path.join(BASE_DIR,'storage', f"{document.public_id}.pkl")
     if os.path.exists(path_to_vectorstore):
         with open(path_to_vectorstore,"rb") as f:
             vectorstore = pickle.load(f)
@@ -49,7 +49,9 @@ async def create_chat(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")
     
     # todo send message to llm
-    answer = send_message_to_llm(vectorstore, body.question)
+    answer, cb = send_message_to_llm(vectorstore, body.question)
+    
+    repository_users_tokens.add_user_tokens(user_id=current_user.id, user_tokens=cb, db=db)
 
     return await repository_chats.create_chat(
         current_user.id,
@@ -64,7 +66,7 @@ async def create_chat(
     '/',
     response_model=List[ChatPublic],
     description='No more than 100 requests per minute',
-    dependencies=[Depends(RateLimiter(times=100, seconds=60))]
+    dependencies=[Depends(RateLimiter(times=3, seconds=60))]
 )
 async def get_chats_by_document_or_user_id(
         document_id: Optional[int] = None,

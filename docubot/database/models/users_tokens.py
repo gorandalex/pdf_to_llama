@@ -11,7 +11,7 @@ class UserToken(Base):
     __tablename__ = 'users_tokens'
     id = Column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    user: Mapped[User] = relationship(backref="documents")
+    user: Mapped[User] = relationship(backref="users_tokens")
     total_user_tokens = Column(Integer, default=0)
     started_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
