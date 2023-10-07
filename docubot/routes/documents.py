@@ -235,7 +235,7 @@ async def delete_document(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, cloudinary.remove_document, document.public_id)
+    # await loop.run_in_executor(None, cloudinary.remove_document, document.public_id)
     await repository_documents.delete_document(document, db)
 
     return {"message": "Document successfully deleted"}
