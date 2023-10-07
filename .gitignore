@@ -5,15 +5,15 @@
 /migrations/__pycache__
 /migrations/versions/__pycache__
 /postgres-data
-/svitlogram/__pycache__
-/svitlogram/database/__pycache__
-/svitlogram/database/models/__pycache__
-/svitlogram/repository/__pycache__
-/svitlogram/routes/__pycache__
-/svitlogram/schemas/__pycache__
-/svitlogram/services/__pycache__
-/svitlogram/utils/__pycache__
-/svitlogram/routes/docs/__pycache__
+/docubot/__pycache__
+/docubot/database/__pycache__
+/docubot/database/models/__pycache__
+/docubot/repository/__pycache__
+/docubot/routes/__pycache__
+/docubot/schemas/__pycache__
+/docubot/services/__pycache__
+/docubot/utils/__pycache__
+/docubot/routes/docs/__pycache__
 /tests/__pycache__
 /tests/.pytest_cache
 /htmlcov
@@ -26,3 +26,4 @@
 /Procfile
 
 /.env
+.vscode/settings.json

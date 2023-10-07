@@ -6,7 +6,7 @@ from pydantic import BaseSettings, EmailStr
 from fastapi.templating import Jinja2Templates
 
 
-PROJECT_NAME = "Svitlogram_Photo"
+PROJECT_NAME = "Docubot"
 VERSION = "1.0.0"
 API_PREFIX = "/api"
 
@@ -23,9 +23,9 @@ ORIGINS = [
 
 @dataclass(frozen=True)
 class Template:
-    emails: Path = BASE_DIR / 'svitlogram' / 'templates' / 'emails'
+    emails: Path = BASE_DIR / 'docubot' / 'templates' / 'emails'
     html_response: Jinja2Templates = Jinja2Templates(
-        directory=BASE_DIR / 'svitlogram' / 'templates' / 'response')
+        directory=BASE_DIR / 'docubot' / 'templates' / 'response')
 
 
 class Settings(BaseSettings):

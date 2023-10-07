@@ -1,6 +1,7 @@
 token = localStorage.getItem("accessToken")
 
-const baseUrl = 'https://svitlogram.fly.dev/'
+//const baseUrl = 'https://svitlogram.fly.dev/'
+const baseUrl = ''
 
 const searchParams = new URLSearchParams(window.location.search);
 const searchValue = searchParams.get('search');
@@ -96,14 +97,7 @@ const getSearch = async () => {
                 const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
                 const formattedDate = createdAt.toLocaleDateString(undefined, dateOptions);
 
-                //usercreateLi.textContent = `Created at: ${formattedDate}`;
-                //usercreateLi.classList.add("text-left");
-                //userInfoUl.appendChild(usercreateLi)
 
-                //const userImageNumberLi = document.createElement("li");
-                //userImageNumberLi.textContent = `Number users photos: ${user.number_of_images}`;
-                //userImageNumberLi.classList.add("text-left");
-                //userInfoUl.appendChild(userImageNumberLi)
 
                 aboutUserDdiv.appendChild(userInfoUl)
                 el2.appendChild(avatarDiv)
@@ -114,13 +108,13 @@ const getSearch = async () => {
             }
             searchList.appendChild(usersInfo)
         }
-        if (result.images.length > 0) {
-            const images = document.createElement("div")
-            images.className = "col-lg-6 mx-auto mb-4"
-            for (const image of result.images) {
+        if (result.documents.length > 0) {
+            const documents = document.createElement("div")
+            documents.className = "col-lg-6 mx-auto mb-4"
+            for (const document of result.documents) {
                 const img = document.createElement('img');
-                img.src = image.url;
-                const user = image.user_id ? await getUserById(image.user_id) : null;
+                img.src = document.url;
+                const user = document.user_id ? await getUserById(document.user_id) : null;
 
                 const avatar = document.createElement('img');
                 avatar.src = user.avatar;
@@ -150,36 +144,36 @@ const getSearch = async () => {
                 photoLink.innerHTML = img.outerHTML;
                 photoDiv.appendChild(photoLink);
 
-                const imagesDescriptionDiv = document.createElement('div');
-                imagesDescriptionDiv.className = "some_class mb-2"
+                const documentsDescriptionDiv = document.createElement('div');
+                documentsDescriptionDiv.className = "some_class mb-2"
                 const descriptionSpan = document.createElement('span');
-                descriptionSpan.textContent = image.description;
-                imagesDescriptionDiv.appendChild(descriptionSpan)
+                descriptionSpan.textContent = document.description;
+                documentsDescriptionDiv.appendChild(descriptionSpan)
 
-                const imageRatingDiv = document.createElement('div');
-                const imageRating = document.createElement('a');
-                imageRating.textContent = `Rating: ${image.avg_rating}`
-                imageRatingDiv.appendChild(imageRating)
-                imagesDescriptionDiv.appendChild(imageRatingDiv)
+                const documentRatingDiv = document.createElement('div');
+                const documentRating = document.createElement('a');
+                documentRating.textContent = `Rating: ${document.avg_rating}`
+                documentRatingDiv.appendChild(documentRating)
+                documentsDescriptionDiv.appendChild(documentRatingDiv)
 
                 const topicsDiv = document.createElement('div');
                 topicsDiv.className = 'node__topics';
                 topicsDiv.textContent = 'Tags: ';
 
-                for (const tag of image.tags) {
+                for (const tag of document.tags) {
                     const tagLink = document.createElement('a');
                     tagLink.className = 'btn mb-2 mb-md-0 btn-outline-danger btn-sm';
                     tagLink.textContent = tag.name;
                     topicsDiv.appendChild(tagLink);
                 }
-                imagesDescriptionDiv.appendChild(topicsDiv)
+                documentsDescriptionDiv.appendChild(topicsDiv)
 
                 el.appendChild(avatarUserNameDiv);
                 el.appendChild(photoDiv);
-                el.appendChild(imagesDescriptionDiv);
-                images.appendChild(el)
+                el.appendChild(documentsDescriptionDiv);
+                documents.appendChild(el)
             }
-            searchList.appendChild(images)
+            searchList.appendChild(documents)
         }
     }
 }

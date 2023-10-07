@@ -15,10 +15,12 @@ from fastapi_limiter import FastAPILimiter
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+import faiss
 
+limiter = FastAPILimiter()
 
-from svitlogram.database.connect import get_db
-from svitlogram.routes import router
+from docubot.database.connect import get_db
+from docubot.routes import router
 from config import (
     settings,
     PROJECT_NAME,
@@ -27,6 +29,7 @@ from config import (
     BANNED_IPS,
     ORIGINS,
 )
+
 
 
 def get_application():
@@ -52,6 +55,7 @@ security = HTTPBearer()
 app = get_application()
 
 
+
 @app.middleware("http")
 async def ban_ips(request: Request, call_next: Callable):
     """
@@ -73,7 +77,7 @@ async def startup():
     """
     The startup function is called when the application starts up.
     It's a good place to initialize things that are used by the application, such as databases or caches.
-    
+
     :return: A coroutine, so we need to run it
     :doc-author: Trelent
     """
@@ -83,7 +87,7 @@ async def startup():
     # )
     r = await redis.Redis(host=settings.redis_host, port=settings.redis_port,
 
-                           db=0, encoding="utf-8", decode_responses=True, password=settings.redis_password) 
+                           db=0, encoding="utf-8", decode_responses=True, password=settings.redis_password)
 
     await FastAPILimiter.init(r)
 
@@ -93,7 +97,7 @@ BASE_DIR = Path(__file__).parent
 app.mount("/static", StaticFiles(directory=BASE_DIR/"static", html=True), name="static")
 
 
-@app.get("/", name="Svitlogram_api", response_class=HTMLResponse)
+@app.get("/", name="Docubot_api", response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
@@ -124,7 +128,8 @@ def healthchecker(db: Session = Depends(get_db)):
 
 
 app.include_router(router, prefix=API_PREFIX)
+# app.add_middleware(SessionMiddleware, secret_key="some-random-secret-key")
 
 
 if __name__ == '__main__':
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", reload=True)

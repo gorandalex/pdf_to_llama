@@ -1,6 +1,7 @@
 console.log("Run")
 
-const baseUrl = 'https://svitlogram.fly.dev'
+//const baseUrl = 'https://svitlogram.fly.dev'
+const baseUrl = ''
 
 const form = document.forms[0]
 
@@ -54,6 +55,6 @@ form.addEventListener("submit", async(e) => {
         result = await response.json()
         localStorage.setItem("accessToken", result.access_token)
         localStorage.setItem("refreshToken", result.refresh_token)
-        window.location = `/static/client_rest/images.html`
+        window.location = `/static/client_rest/documents.html`
     }
 })
