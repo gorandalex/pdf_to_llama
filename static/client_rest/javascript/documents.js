@@ -55,7 +55,7 @@ const getUserByUserName = async (username) => {
     redirect: 'follow'
   };
 
-  const response = await fetch(`${baseUrl}/api/users/${username}`, requestOptions)
+  const response = await requestApi(`${baseUrl}/api/users/${username}`, requestOptions)
   if (response.status === 200) {
     const result = await response.json()
     return result;
@@ -95,7 +95,7 @@ uploadForm.addEventListener("submit", async function (e) {
     body: data
   };
 
-  const response = await fetch(`${baseUrl}/api/documents/`, requestOptions)
+  const response = await requestApi(`${baseUrl}/api/documents/`, requestOptions)
   if (response.status == 201) {
     window.location = `/static/client_rest/documents.html`
   } else {
@@ -111,11 +111,10 @@ const getDocuments = async () => {
 
   const requestOptions = {
     method: 'GET',
-    headers: myHeaders,
     redirect: 'follow'
   };
 
-  const response = await fetch(`${baseUrl}/api/documents/?sort_by=date_added_desc`, requestOptions)
+  const response = await requestApi(`${baseUrl}/api/documents/?sort_by=date_added_desc`, requestOptions)
   if (response.status === 200) {
     const result = await response.json();
     documents.innerHTML = "";
