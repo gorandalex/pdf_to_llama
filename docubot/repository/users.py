@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import exists
 
-from docubot.database.models import User, UserRole, Document
+from docubot.database.models import User, UserRole, UserLevel, Document
 from docubot.schemas.user import UserCreate, ProfileUpdate
 
 
@@ -185,6 +185,22 @@ async def user_update_role(user: User, role: UserRole, db: Session) -> User:
     return user
 
 
+async def user_update_level(user: User, level: UserLevel, db: Session) -> User:
+    """
+    The user_update_role function updates the role of a user.
+    
+    :param user: User: Identify the user that will have their role updated
+    :param role: UserLevel: Set the user's level to the value of level
+    :param db: Session: Pass in the database session to the function
+    :return: The updated user object
+    """
+    user.level = level.value
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+
 async def user_update_is_active(user: User, is_active: bool, db: Session) -> User:
     """
     The user_update_is_active function updates the is_active field of a user.
@@ -244,6 +260,7 @@ async def get_users_with_filter(
         first_name: Optional[str] = None,
         last_name: Optional[str] = None,
         role: Optional[UserRole] = None,
+        level: Optional[UserLevel] = None,
         created_at_start: Optional[str] = None,
         created_at_end: Optional[str] = None,
         has_documents: Optional[bool] = None,
@@ -257,6 +274,7 @@ async def get_users_with_filter(
     :param first_name: str: Filter users by first name
     :param last_name: str: Filter users by last name
     :param role: str: Filter users by role
+    :param level: str: Filter users by level
     :param created_at_start: str: Filter users by created_at start date (format: YYYY-MM-DD)
     :param created_at_end: str: Filter users by created_at end date (format: YYYY-MM-DD)
     :param has_documents: bool: Filter users by the presence of documents
@@ -270,6 +288,8 @@ async def get_users_with_filter(
         query = query.filter(User.last_name == last_name)
     if role:
         query = query.filter(User.role == role)
+    if level:
+        query = query.filter(User.level == level)
     if created_at_start and created_at_end:
         query = query.filter(User.created_at.between(created_at_start, created_at_end))
     if has_documents:

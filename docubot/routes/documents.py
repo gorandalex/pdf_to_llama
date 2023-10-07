@@ -8,7 +8,7 @@ from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.orm import Session
 
 from docubot.database.connect import get_db
-from docubot.database.models import User, UserRole
+from docubot.database.models import User, UserRole, UserLevel
 from docubot.repository import documents as repository_documents, tags as repository_tags
 from docubot.schemas.documents import DocumentCreateResponse, DocumentPublic, DocumentRemoveResponse
 from docubot.services import cloudinary
@@ -17,6 +17,11 @@ import uuid
 import os
 import aiofiles
 from fastapi.responses import FileResponse
+
+from docubot.services.pdf_to_vectorstore import pdf_to_vectorstore
+
+FILE_MORE_5MB = 5*1024*1024
+FILE_MORE_50MB = 50*1024*1024
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
@@ -64,6 +69,19 @@ async def upload_document(
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                             detail=f"Invalid file type. Only allowed {allowed_content_types_upload}.")
     
+    size = file.size
+
+    if size > FILE_MORE_50MB:
+        if current_user.level in ['bronze', 'silver']:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Raise your level to 'GOLD' and download the docs with size more than 50MB")
+    
+    if size >= FILE_MORE_5MB:
+        if current_user.level == 'bronze':
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Raise your level to 'SILVER' or 'GOLD' and download the docs with size 5-50MB")
+
+
     tags = repository_tags.get_list_tags(tags)
 
     if tags and len(tags) > 5:
@@ -102,6 +120,8 @@ async def upload_document(
     async with aiofiles.open(documentFilename, 'wb') as out_file:
         content = await file.read()
         await out_file.write(content)
+
+    await pdf_to_vectorstore(documentFilename)
 
     document = await repository_documents.create_document(
         current_user.id,
