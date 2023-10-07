@@ -17,7 +17,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 import faiss
 
-
+limiter = FastAPILimiter()
 
 from docubot.database.connect import get_db
 from docubot.routes import router
@@ -29,6 +29,7 @@ from config import (
     BANNED_IPS,
     ORIGINS,
 )
+
 
 
 def get_application():
@@ -54,6 +55,7 @@ security = HTTPBearer()
 app = get_application()
 
 
+
 @app.middleware("http")
 async def ban_ips(request: Request, call_next: Callable):
     """
@@ -70,24 +72,24 @@ async def ban_ips(request: Request, call_next: Callable):
     return response
 
 
-# @app.on_event("startup")
-# async def startup():
-#     """
-#     The startup function is called when the application starts up.
-#     It's a good place to initialize things that are used by the application, such as databases or caches.
-#
-#     :return: A coroutine, so we need to run it
-#     :doc-author: Trelent
-#     """
-#     # await FastAPILimiter.init(
-#     #     await redis.Redis(host=settings.redis_host, port=settings.redis_port, password=settings.redis_password,
-#     #                       db=0, encoding="utf-8", decode_responses=True)
-#     # )
-#     r = await redis.Redis(host=settings.redis_host, port=settings.redis_port,
-#
-#                            db=0, encoding="utf-8", decode_responses=True, password=settings.redis_password)
-#
-#     await FastAPILimiter.init(r)
+@app.on_event("startup")
+async def startup():
+    """
+    The startup function is called when the application starts up.
+    It's a good place to initialize things that are used by the application, such as databases or caches.
+
+    :return: A coroutine, so we need to run it
+    :doc-author: Trelent
+    """
+    # await FastAPILimiter.init(
+    #     await redis.Redis(host=settings.redis_host, port=settings.redis_port, password=settings.redis_password,
+    #                       db=0, encoding="utf-8", decode_responses=True)
+    # )
+    r = await redis.Redis(host=settings.redis_host, port=settings.redis_port,
+
+                           db=0, encoding="utf-8", decode_responses=True, password=settings.redis_password)
+
+    await FastAPILimiter.init(r)
 
 
 templates = Jinja2Templates(directory="templates")

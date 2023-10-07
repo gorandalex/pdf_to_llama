@@ -69,7 +69,7 @@ async def create_chat(
     '/',
     response_model=List[ChatPublic],
     description='No more than 100 requests per minute',
-    dependencies=[Depends(RateLimiter(times=3, seconds=60))]
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))]
 )
 async def get_chats_by_document_or_user_id(
         document_id: Optional[int] = None,
