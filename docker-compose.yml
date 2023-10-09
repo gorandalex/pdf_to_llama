@@ -27,6 +27,14 @@ services:
     environment:
       DB_HOST: pdf_to_llama-postgres-1
       REDIS_HOST: pdf_to_llama-redis-1
+  alembic:
+    build:
+      context: .
+    depends_on:
+      - postgres
+    entrypoint: alembic upgrade head
+    environment:
+      DATABASE_URL: "postgresql://${DB_NAME}:${DB_PASSWORD}@db:5432/${DB_NAME}"  
 
 volumes:
   db-data:
