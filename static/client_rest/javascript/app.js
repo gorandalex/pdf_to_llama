@@ -6,6 +6,8 @@ const requestApi = async (url, options) => {
 
     if (!options.headers) {
         options.headers = new Headers();
+    } else if (!(options.headers instanceof Headers)) {
+        options.headers = new Headers(options.headers);
     }
 
     options.headers.set('Authorization', `Bearer ${token}`);
