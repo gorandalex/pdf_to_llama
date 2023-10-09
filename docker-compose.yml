@@ -16,6 +16,17 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+  ducubot:
+    image: andriihorobets/docubot:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - postgres
+    env_file: .env
+    environment:
+      DB_HOST: pdf_to_llama-postgres-1
+      REDIS_HOST: pdf_to_llama-redis-1
 
 volumes:
   db-data:

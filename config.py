@@ -29,8 +29,8 @@ class Template:
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql://postgres:password@localhost:5432/postgres"
-    DATABASE_URL_TEST: str = "postgresql://postgres:password@localhost:5432/postgres"
+    DATABASE_URL: str = "postgresql://postgres:password@DB_HOST:5432/postgres"
+    DATABASE_URL_TEST: str = "postgresql://postgres:password@DB_HOST:5432/postgres"
 
     secret_key_jwt: str = "secret_key_jwt"
     algorithm: str = "HS256"
@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     mail_server: str = "smtp.test.com"
     mail_from_name: str = "Name"
 
-    redis_host: str = "localhost"
+    redis_host: str = "REDIS_HOST"
     redis_port: int = 6379
     redis_password: str = "qwerty"
 

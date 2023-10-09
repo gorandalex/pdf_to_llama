@@ -39,7 +39,7 @@ async def create_chat(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found document")
     
     total_user_tokens = await repository_users_tokens.get_total_user_tokens(current_user.id, db)
-    if total_user_tokens > 10000:
+    if total_user_tokens > 100000:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="You've used all daily tokens. We are waiting for you tomorrow")
 
