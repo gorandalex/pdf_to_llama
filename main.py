@@ -5,6 +5,7 @@ import openai
 from pathlib import Path
 import uvicorn
 import redis.asyncio as redis
+import aioredis
 from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -85,10 +86,13 @@ async def startup():
     #     await redis.Redis(host=settings.redis_host, port=settings.redis_port, password=settings.redis_password,
     #                       db=0, encoding="utf-8", decode_responses=True)
     # )
-    r = await redis.Redis(host=settings.redis_host, port=settings.redis_port,
+    # r = await redis.Redis(host=settings.redis_host, port=settings.redis_port,
 
-                           db=0, encoding="utf-8", decode_responses=True, password=settings.redis_password)
+    #                        db=0, encoding="utf-8", decode_responses=True, password=settings.redis_password)
 
+    print(settings.redis_host)
+    r = await aioredis.from_url(f'redis://{settings.redis_host}:{settings.redis_port}', encoding="utf-8", decode_responses=True)
+    
     await FastAPILimiter.init(r)
 
 

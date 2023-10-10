@@ -16,6 +16,18 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+  ducubot:
+    image: andriihorobets/docubot:latest
+    environment:
+      DB_HOST: pdf_to_llama-postgres-1
+      REDIS_HOST: pdf_to_llama-redis-1
+    ports:
+      - "8000:8000"
+    # command:  bash -c "alembic upgrade head"
+    depends_on:
+      - redis
+      - postgres
+    env_file: .env
 
 volumes:
   db-data:

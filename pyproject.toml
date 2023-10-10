@@ -38,6 +38,7 @@ tiktoken = "^0.5.1"
 pypdf = "^3.16.2"
 pathlib = "^1.0.1"
 environs = "^9.5.0"
+aioredis = "^2.0.1"
 
 
 [tool.poetry.group.test.dependencies]
